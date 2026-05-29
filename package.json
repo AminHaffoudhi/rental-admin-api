@@ -12,6 +12,8 @@
   "license": "ISC",
   "description": "Express REST API for admin panel (JWT admin-only)",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1052.0",
+    "@aws-sdk/s3-request-presigner": "^3.1052.0",
     "@onesignal/node-onesignal": "^5.6.0",
     "@prisma/client": "6.19.3",
     "@sentry/node": "^10.53.1",

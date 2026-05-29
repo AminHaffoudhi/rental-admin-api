@@ -1,6 +1,5 @@
 import {
   BookingStatus,
-  Category,
   DeliveryStatus,
   DisputeStatus,
   KycStatus,
@@ -49,10 +48,6 @@ export function parsePaymentStatus(raw: unknown): PaymentStatus | undefined {
 
 export function parseDisputeStatus(raw: unknown): DisputeStatus | undefined {
   return optionalEnum(raw, DisputeStatus as Record<string, DisputeStatus>, "status");
-}
-
-export function parseCategory(raw: unknown): Category | undefined {
-  return optionalEnum(raw, Category as Record<string, Category>, "category");
 }
 
 export function optionalString(raw: unknown): string | undefined {

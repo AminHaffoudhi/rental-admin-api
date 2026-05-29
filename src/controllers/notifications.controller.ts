@@ -1,5 +1,12 @@
 import type { Request, Response } from "express";
-import { DisputeStatus, KycStatus, PaymentStatus, Role } from "@prisma/client";
+import {
+  DisputeStatus,
+  EquipmentApprovalStatus,
+  KycStatus,
+  ReviewStatus,
+  PaymentStatus,
+  Role,
+} from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { success } from "@/utils/apiResponse";
 
@@ -16,7 +23,8 @@ export interface AdminNotificationDto {
 export async function list(_req: Request, res: Response): Promise<void> {
   const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 
-  const [newUsers, kycPending, openDisputes, pendingPayments] = await Promise.all([
+  const [newUsers, kycPending, openDisputes, pendingPayments, pendingEquipment, pendingReviews] =
+    await Promise.all([
     prisma.user.findMany({
       where: {
         role: { in: [Role.RENTER, Role.OWNER, Role.BOTH] },
@@ -43,6 +51,30 @@ export async function list(_req: Request, res: Response): Promise<void> {
       orderBy: { createdAt: "desc" },
       take: 5,
       select: { id: true, bookingId: true, createdAt: true },
+    }),
+    prisma.equipment.findMany({
+      where: { approvalStatus: EquipmentApprovalStatus.PENDING },
+      orderBy: { createdAt: "desc" },
+      take: 8,
+      select: {
+        id: true,
+        title: true,
+        createdAt: true,
+        owner: { select: { name: true, email: true } },
+      },
+    }),
+    prisma.review.findMany({
+      where: { status: ReviewStatus.PENDING },
+      orderBy: { createdAt: "desc" },
+      take: 8,
+      select: {
+        id: true,
+        type: true,
+        createdAt: true,
+        reviewer: { select: { name: true } },
+        reviewee: { select: { name: true } },
+        equipment: { select: { title: true } },
+      },
     }),
   ]);
 
@@ -81,6 +113,27 @@ export async function list(_req: Request, res: Response): Promise<void> {
       body: `Booking ${p.bookingId.slice(0, 8)} is awaiting payout`,
       url: "/payments",
       timestamp: p.createdAt,
+      read: false,
+    })),
+    ...pendingEquipment.map((e) => ({
+      id: `equipment-pending-${e.id}`,
+      type: "equipment_pending",
+      title: "📦 New listing pending approval",
+      body: `${e.owner.name} submitted "${e.title}" for review`,
+      url: `/equipment?highlight=${e.id}`,
+      timestamp: e.createdAt,
+      read: false,
+    })),
+    ...pendingReviews.map((r) => ({
+      id: `review-pending-${r.id}`,
+      type: "review_pending",
+      title: "⭐ New review to moderate",
+      body:
+        r.type === "EQUIPMENT"
+          ? `${r.reviewer.name} reviewed "${r.equipment?.title ?? "listing"}" (${r.reviewee.name})`
+          : `${r.reviewer.name} reviewed owner ${r.reviewee.name}`,
+      url: `/reviews?highlight=${r.id}`,
+      timestamp: r.createdAt,
       read: false,
     })),
   ]

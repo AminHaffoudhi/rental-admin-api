@@ -1,5 +1,6 @@
 import { ADMIN_CLIENT_URL, CLIENT_URL } from "@/config/env";
 
+/** Any localhost / 127.0.0.1 port (Vite may pick 5173, 5174, 5175, …). */
 const LOCALHOST_ORIGIN = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/;
 
 function normalizeOrigin(url: string): string {
@@ -8,8 +9,8 @@ function normalizeOrigin(url: string): string {
 
 export function buildAllowedOrigins(): string[] {
   const fromEnv = [
-    ADMIN_CLIENT_URL,
     CLIENT_URL,
+    ADMIN_CLIENT_URL,
     ...(process.env.CORS_ORIGINS ?? "").split(","),
   ]
     .map((s) => s.trim())
