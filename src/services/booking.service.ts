@@ -84,11 +84,16 @@ export async function confirmPayment(bookingId: string, adminId: string) {
     });
 
     const existingDelivery = await tx.delivery.findUnique({ where: { bookingId } });
-    if (!existingDelivery) {
+    if (existingDelivery) {
+      await tx.delivery.update({
+        where: { bookingId },
+        data: { status: DeliveryStatus.DELIVERED },
+      });
+    } else {
       await tx.delivery.create({
         data: {
           bookingId,
-          status: DeliveryStatus.SCHEDULED,
+          status: DeliveryStatus.DELIVERED,
           pickupPhotos: [],
           returnPhotos: [],
         },
@@ -97,7 +102,7 @@ export async function confirmPayment(bookingId: string, adminId: string) {
 
     return tx.booking.update({
       where: { id: bookingId },
-      data: { status: BookingStatus.PAID },
+      data: { status: BookingStatus.ACTIVE },
       include: {
         equipment: true,
         renter: true,
@@ -107,12 +112,6 @@ export async function confirmPayment(bookingId: string, adminId: string) {
       },
     });
   });
-
-  if (updated.delivery) {
-    void sendDeliveryScheduledEmail(updated.renter, updated.delivery, updated).catch((err) =>
-      logNonCriticalEmailFailure("delivery_scheduled", err, { bookingId: updated.id })
-    );
-  }
 
   return updated;
 }
