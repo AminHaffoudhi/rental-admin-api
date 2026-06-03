@@ -33,6 +33,10 @@ export async function uploadDirect(
   }
 
   const fileKey = generateFileKey(folder, userId, fileName);
-  await putObjectBuffer(PUBLIC_BUCKET, fileKey, buffer, contentType);
-  return { url: getPublicUrl(fileKey), fileKey, bucket: PUBLIC_BUCKET };
+  const result = await putObjectBuffer(PUBLIC_BUCKET, fileKey, buffer, contentType);
+  return {
+    url: result.secure_url || getPublicUrl(fileKey),
+    fileKey,
+    bucket: PUBLIC_BUCKET,
+  };
 }

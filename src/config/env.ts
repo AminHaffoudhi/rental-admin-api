@@ -1,4 +1,6 @@
-import "dotenv/config";
+import dotenv from "dotenv";
+
+dotenv.config({ override: true });
 
 function requireNonEmpty(name: string, value: string | undefined): string {
   if (value === undefined || value.trim() === "") {
@@ -20,42 +22,25 @@ export const PORT = parsedPort;
 
 export const ADMIN_CLIENT_URL = requireNonEmpty("ADMIN_CLIENT_URL", process.env.ADMIN_CLIENT_URL);
 
-export const STORAGE_ENDPOINT = requireNonEmpty(
-  "MINIO_ENDPOINT or S3_ENDPOINT",
-  process.env.MINIO_ENDPOINT?.trim() || process.env.S3_ENDPOINT?.trim()
+export const CLOUDINARY_CLOUD_NAME = requireNonEmpty(
+  "CLOUDINARY_CLOUD_NAME",
+  process.env.CLOUDINARY_CLOUD_NAME
 );
 
-export const STORAGE_REGION = (
-  process.env.MINIO_REGION?.trim() || process.env.S3_REGION?.trim() || "us-east-1"
-).trim();
-
-export const STORAGE_ACCESS_KEY = requireNonEmpty(
-  "MINIO_ACCESS_KEY, S3_ACCESS_KEY, or MINIO_ROOT_USER",
-  process.env.MINIO_ACCESS_KEY?.trim() ||
-    process.env.S3_ACCESS_KEY?.trim() ||
-    process.env.MINIO_ROOT_USER?.trim()
+export const CLOUDINARY_API_KEY = requireNonEmpty(
+  "CLOUDINARY_API_KEY",
+  process.env.CLOUDINARY_API_KEY
 );
 
-export const STORAGE_SECRET_KEY = requireNonEmpty(
-  "MINIO_SECRET_KEY, S3_SECRET_KEY, or MINIO_ROOT_PASSWORD",
-  process.env.MINIO_SECRET_KEY?.trim() ||
-    process.env.S3_SECRET_KEY?.trim() ||
-    process.env.MINIO_ROOT_PASSWORD?.trim()
+export const CLOUDINARY_API_SECRET = requireNonEmpty(
+  "CLOUDINARY_API_SECRET",
+  process.env.CLOUDINARY_API_SECRET
 );
 
-export const STORAGE_PUBLIC_BUCKET = (
-  process.env.MINIO_PUBLIC_BUCKET?.trim() || process.env.S3_BUCKET?.trim() || "rentmarket-public"
-).trim();
-
-export const STORAGE_PRIVATE_BUCKET = (
-  process.env.MINIO_PRIVATE_BUCKET?.trim() || "rentmarket-private"
-).trim();
-
-export const STORAGE_PUBLIC_BASE_URL = (
-  process.env.MINIO_PUBLIC_URL?.trim() ||
-  process.env.S3_PUBLIC_BASE_URL?.trim() ||
-  `${STORAGE_ENDPOINT.replace(/\/+$/, "")}/${STORAGE_PUBLIC_BUCKET}`
-).replace(/\/+$/, "");
+export const CLOUDINARY_FOLDER = (process.env.CLOUDINARY_FOLDER?.trim() || "rentmarket").replace(
+  /\/+$/,
+  ""
+);
 
 export const UPLOAD_MAX_IMAGE_MB = Number(process.env.UPLOAD_MAX_IMAGE_MB) || 10;
 
