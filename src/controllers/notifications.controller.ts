@@ -6,6 +6,7 @@ import {
   ReviewStatus,
   PaymentStatus,
   Role,
+  SupportReportStatus,
 } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { success } from "@/utils/apiResponse";
@@ -23,7 +24,7 @@ export interface AdminNotificationDto {
 export async function list(_req: Request, res: Response): Promise<void> {
   const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 
-  const [newUsers, kycPending, openDisputes, pendingPayments, pendingEquipment, pendingReviews] =
+  const [newUsers, kycPending, openDisputes, pendingPayments, pendingEquipment, pendingReviews, newReports] =
     await Promise.all([
     prisma.user.findMany({
       where: {
@@ -76,13 +77,37 @@ export async function list(_req: Request, res: Response): Promise<void> {
         equipment: { select: { title: true } },
       },
     }),
+    prisma.supportReport.findMany({
+      where: { status: SupportReportStatus.NEW },
+      orderBy: { createdAt: "desc" },
+      take: 8,
+      select: {
+        id: true,
+        type: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+        subject: true,
+        message: true,
+        createdAt: true,
+      },
+    }),
   ]);
 
   const notifications: AdminNotificationDto[] = [
+    ...newReports.map((r) => ({
+      id: `report-${r.id}`,
+      type: "support_report",
+      title: r.type === "REPORT" ? "New issue report" : "New contact message",
+      body: `${r.firstName} ${r.lastName} (${r.email}): ${(r.subject || r.message).slice(0, 80)}`,
+      url: `/reports/${r.id}`,
+      timestamp: r.createdAt,
+      read: false,
+    })),
     ...newUsers.map((u) => ({
       id: `user-${u.id}`,
       type: "new_user",
-      title: "👤 New user registered",
+      title: "New user registered",
       body: `${u.name} (${u.email}) joined as ${u.role.toLowerCase()}`,
       url: "/users",
       timestamp: u.createdAt,
@@ -91,7 +116,7 @@ export async function list(_req: Request, res: Response): Promise<void> {
     ...kycPending.map((u) => ({
       id: `kyc-${u.id}`,
       type: "kyc_submitted",
-      title: "🪪 Pending KYC review",
+      title: "Pending KYC review",
       body: `${u.name} (${u.email}) submitted their identity document`,
       url: "/users?tab=kyc",
       timestamp: u.updatedAt,
@@ -100,7 +125,7 @@ export async function list(_req: Request, res: Response): Promise<void> {
     ...openDisputes.map((d) => ({
       id: `dispute-${d.id}`,
       type: "dispute_opened",
-      title: "⚠️ Open dispute",
+      title: "Open dispute",
       body: `Booking ${d.bookingId.slice(0, 8)} has an unresolved dispute`,
       url: "/disputes",
       timestamp: d.createdAt,
@@ -109,7 +134,7 @@ export async function list(_req: Request, res: Response): Promise<void> {
     ...pendingPayments.map((p) => ({
       id: `payout-${p.id}`,
       type: "payment_received",
-      title: "💰 Payout pending",
+      title: "Payout pending",
       body: `Booking ${p.bookingId.slice(0, 8)} is awaiting payout`,
       url: "/payments",
       timestamp: p.createdAt,
@@ -118,7 +143,7 @@ export async function list(_req: Request, res: Response): Promise<void> {
     ...pendingEquipment.map((e) => ({
       id: `equipment-pending-${e.id}`,
       type: "equipment_pending",
-      title: "📦 New listing pending approval",
+      title: "New listing pending approval",
       body: `${e.owner.name} submitted "${e.title}" for review`,
       url: `/equipment?highlight=${e.id}`,
       timestamp: e.createdAt,
@@ -127,7 +152,7 @@ export async function list(_req: Request, res: Response): Promise<void> {
     ...pendingReviews.map((r) => ({
       id: `review-pending-${r.id}`,
       type: "review_pending",
-      title: "⭐ New review to moderate",
+      title: "New review to moderate",
       body:
         r.type === "EQUIPMENT"
           ? `${r.reviewer.name} reviewed "${r.equipment?.title ?? "listing"}" (${r.reviewee.name})`

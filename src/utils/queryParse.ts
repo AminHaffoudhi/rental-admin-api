@@ -5,6 +5,8 @@ import {
   KycStatus,
   PaymentStatus,
   Role,
+  SupportReportStatus,
+  SupportReportType,
 } from "@prisma/client";
 import { HttpError } from "@/utils/httpError";
 
@@ -48,6 +50,25 @@ export function parsePaymentStatus(raw: unknown): PaymentStatus | undefined {
 
 export function parseDisputeStatus(raw: unknown): DisputeStatus | undefined {
   return optionalEnum(raw, DisputeStatus as Record<string, DisputeStatus>, "status");
+}
+
+export function parseReportStatus(raw: unknown): SupportReportStatus | undefined {
+  return optionalEnum(raw, SupportReportStatus as Record<string, SupportReportStatus>, "status");
+}
+
+export function parseReportType(raw: unknown): SupportReportType | undefined {
+  return optionalEnum(raw, SupportReportType as Record<string, SupportReportType>, "type");
+}
+
+export function parsePositiveInt(raw: unknown, label: string): number | undefined {
+  if (raw === undefined || raw === null || raw === "") {
+    return undefined;
+  }
+  const n = Number(raw);
+  if (!Number.isInteger(n) || n < 1) {
+    throw new HttpError(400, `Invalid query parameter: ${label}`);
+  }
+  return n;
 }
 
 export function optionalString(raw: unknown): string | undefined {

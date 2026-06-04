@@ -6,6 +6,7 @@ import categoryRoutes from "@/routes/category.routes";
 import uploadRoutes from "@/routes/upload.routes";
 import deliveryRoutes from "@/routes/delivery.routes";
 import disputeRoutes from "@/routes/dispute.routes";
+import reportRoutes from "@/routes/report.routes";
 import equipmentRoutes from "@/routes/equipment.routes";
 import reviewRoutes from "@/routes/review.routes";
 import notificationsRoutes from "@/routes/notifications.routes";
@@ -28,6 +29,7 @@ router.use("/bookings", bookingRoutes);
 router.use("/deliveries", deliveryRoutes);
 router.use("/payments", paymentRoutes);
 router.use("/disputes", disputeRoutes);
+router.use("/reports", reportRoutes);
 router.use("/notifications", notificationsRoutes);
 
 export default router;

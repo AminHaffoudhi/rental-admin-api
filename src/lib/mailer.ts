@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+import { PLATFORM_NAME } from "@/config/brand";
 import logger from "@/lib/logger";
 
 const host = process.env.SMTP_HOST || "smtp.gmail.com";
@@ -49,7 +50,7 @@ export async function sendMail(options: MailOptions): Promise<void> {
     throw new Error(msg);
   }
   const info = await transporter.sendMail({
-    from: `"RentMarket Admin" <${fromUser}>`,
+    from: `"${PLATFORM_NAME} Admin" <${fromUser}>`,
     ...options,
   });
   logger.info("Email sent", { messageId: info.messageId, to: options.to });

@@ -37,7 +37,7 @@ export const CLOUDINARY_API_SECRET = requireNonEmpty(
   process.env.CLOUDINARY_API_SECRET
 );
 
-export const CLOUDINARY_FOLDER = (process.env.CLOUDINARY_FOLDER?.trim() || "rentmarket").replace(
+export const CLOUDINARY_FOLDER = (process.env.CLOUDINARY_FOLDER?.trim() || "ekri").replace(
   /\/+$/,
   ""
 );

@@ -1,4 +1,5 @@
 import type { Booking, Delivery, User } from "@prisma/client";
+import { PLATFORM_NAME } from "@/config/brand";
 import { sendMail } from "@/lib/mailer";
 import logger from "@/lib/logger";
 import { formatCurrency } from "@/utils/currency";
@@ -31,9 +32,9 @@ export function baseTemplate(content: string): string {
   <body>
     <div class="wrapper">
       <div class="card">
-        <div class="header"><h1>● RentMarket</h1></div>
+        <div class="header"><h1>● ${PLATFORM_NAME}</h1></div>
         <div class="body">${content}</div>
-        <div class="footer">© 2026 RentMarket · Tunisia</div>
+        <div class="footer">© 2026 ${PLATFORM_NAME} · Tunisia</div>
       </div>
     </div>
   </body>
@@ -72,7 +73,7 @@ export async function sendKycApprovedEmail(to: string, name: string): Promise<vo
     html: baseTemplate(`
       <p>Hi <strong>${esc(name)}</strong>,</p>
       <p>Great news! Your identity has been <strong style="color:#16a34a">verified</strong>.</p>
-      <p>You can now list your equipment on RentMarket and start earning.</p>
+      <p>You can now list your equipment on ${PLATFORM_NAME} and start earning.</p>
       <a href="${base}/equipment/new" class="btn">Create Your First Listing →</a>
     `),
   });
