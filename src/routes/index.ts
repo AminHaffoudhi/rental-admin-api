@@ -11,6 +11,7 @@ import equipmentRoutes from "@/routes/equipment.routes";
 import reviewRoutes from "@/routes/review.routes";
 import notificationsRoutes from "@/routes/notifications.routes";
 import paymentRoutes from "@/routes/payment.routes";
+import profileRoutes from "@/routes/profile.routes";
 import statsRoutes from "@/routes/stats.routes";
 import userRoutes from "@/routes/user.routes";
 
@@ -20,6 +21,7 @@ router.use("/auth", authRoutes);
 
 router.use(adminAuth);
 router.use("/upload", uploadRoutes);
+router.use("/profile", profileRoutes);
 router.use("/categories", categoryRoutes);
 router.use("/stats", statsRoutes);
 router.use("/users", userRoutes);

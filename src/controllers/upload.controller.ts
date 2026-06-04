@@ -4,7 +4,7 @@ import type { UploadFolder } from "@/lib/storage";
 import * as uploadService from "@/services/upload.service";
 import { success } from "@/utils/apiResponse";
 
-const FOLDERS: UploadFolder[] = ["categories"];
+const FOLDERS: UploadFolder[] = ["categories", "avatars"];
 
 function parseFolder(raw: string | undefined): UploadFolder {
   const f = raw?.trim().toLowerCase();
