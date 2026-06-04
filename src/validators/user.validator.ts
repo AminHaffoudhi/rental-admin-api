@@ -9,3 +9,7 @@ export const kycActionSchema = z.object({
   action: z.literal("REJECTED"),
   note: z.string().min(1, "Reason for rejection is required"),
 });
+
+export const blockUserSchema = z.object({
+  reason: z.string().max(500).optional(),
+});

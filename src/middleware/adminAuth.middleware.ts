@@ -2,6 +2,7 @@ import type { NextFunction, Request, Response } from "express";
 import { Role } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { ForbiddenError, UnauthorizedError } from "@/lib/errors";
+import { HttpError } from "@/utils/httpError";
 import { verifyToken } from "@/utils/jwt";
 
 export async function adminAuth(req: Request, _res: Response, next: NextFunction): Promise<void> {
@@ -25,6 +26,16 @@ export async function adminAuth(req: Request, _res: Response, next: NextFunction
     }
     if (user.role !== Role.ADMIN) {
       next(new ForbiddenError("Admin access only"));
+      return;
+    }
+    if (user.blockedAt) {
+      next(
+        new HttpError(
+          403,
+          "This admin account has been suspended.",
+          "ACCOUNT_BLOCKED"
+        )
+      );
       return;
     }
     req.user = {

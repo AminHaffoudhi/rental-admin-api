@@ -30,6 +30,13 @@ export async function adminLogin(
   if (!ok) {
     throw new HttpError(401, "Invalid credentials");
   }
+  if (user.blockedAt) {
+    throw new HttpError(
+      403,
+      "This admin account has been suspended.",
+      "ACCOUNT_BLOCKED"
+    );
+  }
   const token = signToken({
     id: user.id,
     role: user.role,

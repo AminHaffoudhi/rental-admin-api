@@ -49,3 +49,18 @@ export async function updateRole(req: Request, res: Response): Promise<void> {
   const user = await userService.updateUserRole(req.params.id as string, body.role);
   success(res, user);
 }
+
+export async function block(req: Request, res: Response): Promise<void> {
+  const adminId = req.user?.id;
+  if (!adminId) {
+    throw new HttpError(401, "Unauthorized");
+  }
+  const body = req.body as { reason?: string };
+  const user = await userService.blockUser(req.params.id as string, adminId, body.reason);
+  success(res, user);
+}
+
+export async function unblock(req: Request, res: Response): Promise<void> {
+  const user = await userService.unblockUser(req.params.id as string);
+  success(res, user);
+}
