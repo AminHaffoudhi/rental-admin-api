@@ -3,6 +3,7 @@ import * as Sentry from "@sentry/node";
 import { createApp } from "@/app";
 import logger from "@/lib/logger";
 import { prisma } from "@/lib/prisma";
+import { seedAdmin } from "@/seed/adminSeed";
 
 if (process.env.SENTRY_DSN) {
   Sentry.init({
@@ -20,6 +21,7 @@ const server = app.listen(PORT, () => {
     env: process.env.NODE_ENV,
     pid: process.pid,
   });
+  void seedAdmin();
 });
 
 async function shutdown(signal: string): Promise<void> {
